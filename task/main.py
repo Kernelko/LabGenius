@@ -1,14 +1,9 @@
-""" Machine learning of proteins """
 
 import pandas as pd
-from string import ascii_letters
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
-from sklearn import svm
+from sklearn import linear_model
 from sklearn.metrics import accuracy_score
-
-
 
 def reading():
     """read file into dataframe"""
@@ -19,32 +14,8 @@ def reading():
     y_train = df["score"][:]
     return x_train, y_train
 
-
-"""
-def map_protein_to_numbers(protein):
-    letters = list(ascii_letters)
-    numbers = list(range(len(ascii_letters)))
-    map_dict = dict(zip(letters, numbers))
-    result = []
-    for letter in protein:
-        result.append(map_dict[letter.lower()])
-    return result
-
-x_train_mapped =[]
-for sequence in x_train:
-    x_train_mapped.append(map_protein_to_numbers(sequence))
-
-"""
-
 x_train, y_train = reading()
 
-### DIFFERENT APPROACH
-"""
-Aliphatic - A,G, I, L, P, V 
-Aromatic - F  , W  , Y  
-Acidic - D  , E  
-Basic - R  , H  , K
-"""
 
 # Features are how many aliphatic, aromatic and acidic and basic are in sequence
 
@@ -66,16 +37,16 @@ x_train_groupped = []
 for sequence in x_train:
     x_train_groupped.append(feature_selector(sequence))
 
-##ALL READ SO NOW SPLITTING THE DATA
+##SPLITTING THE DATA
 
 X_train, X_test, y_train, y_test = train_test_split(x_train_groupped, y_train, test_size=0.33, random_state=42)
 print(len(X_train), len(X_test))
 
-##Choosing the classifier (should be SVG)
+##Choosing the classifier 
 
-clf = svm.SVC()
+clf = RandomForestClassifier()
 
-##classifying on train
+##classifying on train set
 
 clf.fit(X_train, y_train)
 
@@ -87,3 +58,18 @@ y_predicted = clf.predict(X_test)
 
 print(accuracy_score(y_test, y_predicted))
 
+
+#PREDICTION
+
+df_problem= pd.read_csv("PROBLEM_SET.csv", names = ["sequence"])
+x_train_problem = df_problem["sequence"][:]
+x_train_problem_groupped = []
+
+for sequence in x_train_problem:
+    x_train_problem_groupped.append(feature_selector(sequence))
+
+y_predicted_problem = clf.predict(x_train_problem_groupped)
+
+df_problem["predicted_scores"] = y_predicted_problem
+
+df_problem.to_csv("result.csv", columns = ["sequence", "predicted_scores"])

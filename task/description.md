@@ -1,39 +1,27 @@
-### Task explained
+### Brief explanation of the steps I took to complete this task
 
-This is a classification task: train a model based on results, predict some values.
+My approach in steps:
 
-things to do :
-1) read the data
-readed into pandas, cause it's easiest way to do it
-we have two columns, protein sequence and score it gets
-
-2) prepare the data
-feature selection
-sequence part is string, it's hard to do anything with it (it can be nlp, but it's not possible here since learning grammars for that would take ages)
-so we have to map letters to numbers so it's possible to sklearn do soemthing with it.
-It's not a perfect solution since letters actually mean something, maybe i will group it somehow later
-
-lets try with acidic, basic, polar, non-polar
+1)I have read the data into pandas dataframe to easily access the columns I need.
+2) I extracted the features of the sequences : at first I tried to map letters to numbers, but it makes no sense cause these letters are amino acids in proteins and we can use it to get more information from sequence. My approach is to count how many of each amino acid type are in a given sequence. I groupped them into 5 groups: aliphatic, aromatic, acidic, basic and other (the ones that don't belong to any group). 
 
 Aliphatic - alanine,glycine, isoleucine, leucine, proline, valine 
 Aromatic - phenylalanine  , tryptophan  , tyrosine  
 Acidic - aspartic acid  , glutamic acid  
 Basic - arginine  , histidine  , lysine
 
+I have written a function that returns an array of how many amino acids of each group are in the given sequence and used it in training the model.
 
-3) split data into test and train 
+3)Splitting data
+To evaluate the quality of the model we have to check how it works when we know the scores.
+That is why I split the dataset into test and train groups and check how well the model classified on test set. 
 
-to evaluate the quality of the model we have to check how it works when we know the scores.
-That is why I split the dataset into test and train 
-I am doing cross validation - this way I will repeat training on different splits of my dataset 
+3) Choosing the model
+Here I chosed SVC but I did not have enough time to think of it more, there are many options here.  
 
-3) choose the model
+6) Model evaluation 
+Checking the accuracy to find out how well the model predicts
 
-Here I chosed support vector machine but it could be any other model
+7) Predicting unknown values.
 
-4) learn the model
-
-5) evaluate  model
-
-6) predict unknown values
 
