@@ -23,6 +23,10 @@ def map_protein_to_numbers(protein):
 
 x_train, y_train = reading()
 
-result = map_protein_to_numbers(x_train[1])
-print(result)
+x_train_mapped =[]
+for sequence in x_train:
+    x_train_mapped.append(map_protein_to_numbers(sequence))
+
+
+
 
