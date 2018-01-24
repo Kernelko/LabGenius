@@ -6,10 +6,11 @@ from string import ascii_letters
 def training():
     "training function"
 
-    df = pd.read_csv("TRAINING_SET.csv") #read into dataframe
-    x_train = df.iloc[0,:] 
-    y_train = df.iloc[:,0]
-    return x_train[1:10]
+    df = pd.read_csv("TRAINING_SET.csv", names = ["sequence", "score"])
+     #read into dataframe
+    x_train = df["sequence"][:]
+    y_train = df["score"][:]
+    return x_train, y_train
 
 def mapping(protein):
     letters = list(ascii_letters)
@@ -20,5 +21,6 @@ def mapping(protein):
         result.append(map_dict[letter.lower()])
     return result
 
-cos = training()
-mapping(cos)
+x_train, y_train = training()
+print(x_train[1])
+#mapping(cos)
