@@ -1,9 +1,26 @@
 
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn import linear_model
 from sklearn.metrics import accuracy_score
+from string  import ascii_letters
+from keras.models import Sequential  
+from keras.layers.core import Dense, Activation  
+from keras.layers.recurrent import LSTM
+
+in_out_neurons = 2  
+hidden_neurons = 300
+
+model = Sequential()
+model.add(LSTM(hidden_neurons, return_sequences=False,
+               input_shape=(None, in_out_neurons)))
+model.add(Dense(in_out_neurons, input_dim=hidden_neurons))  
+model.add(Activation("linear"))  
+model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=['accuracy'])
+
+
 
 def reading():
     """read file into dataframe"""
@@ -16,12 +33,12 @@ def reading():
 
 x_train, y_train = reading()
 
-
+"""
 # Features are how many aliphatic, aromatic and acidic and basic are in sequence
 
 def feature_selector(protein):
-    """extract features from protein sequence: counts how many of each amino acid type protein has."""
-    """returns an array with number of amino acids in protein from specific group in a form [Aliphatic, Aromatic, Acidic, Basic, Other]"""
+    extract features from protein sequence: counts how many of each amino acid type protein has.
+    returns an array with number of amino acids in protein from specific group in a form [Aliphatic, Aromatic, Acidic, Basic, Other]
 
     grouped = [("a", "g", "i","l", "p", "v"),("f", "w", "y"),("d", "e"),("r", "h", "k"), ("n", "c", "q", "m", "s", "t")]
     features_array = [0,0,0,0,0]
@@ -36,40 +53,57 @@ x_train_groupped = []
 
 for sequence in x_train:
     x_train_groupped.append(feature_selector(sequence))
+"""
+
+#INSTEAD OF GROUPING JUST MAP PROTEIN TO NUMBERS AND THEN LSTM
+def map_protein_to_numbers(protein):
+    letters = list(ascii_letters)
+    numbers = list(range(len(ascii_letters)))
+    map_dict = dict(zip(letters, numbers))
+    result = []
+    for letter in protein:
+        result.append(map_dict[letter.lower()])
+    return result
+
+x_train_mapped = []
+for sequence in x_train:
+    x_train_mapped.append(map_protein_to_numbers(sequence))
+
+
+
 
 ##SPLITTING THE DATA
 
-X_train, X_test, y_train, y_test = train_test_split(x_train_groupped, y_train, test_size=0.33, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(x_train_mapped, y_train, test_size=0.33, random_state=42)
 print(len(X_train), len(X_test))
 
 ##Choosing the classifier 
 
-clf = RandomForestClassifier()
 
 ##classifying on train set
 
-clf.fit(X_train, y_train)
+model.fit(np.array(X_train), np.array(y_train))
 
 ## testing on test
 
-y_predicted = clf.predict(X_test)
+#y_predicted = model.predict(X_test)
 
 ##results 
 
-print(accuracy_score(y_test, y_predicted))
+#print(accuracy_score(y_test, y_predicted))
 
 
 #PREDICTION
 
-df_problem= pd.read_csv("PROBLEM_SET.csv", names = ["sequence"])
-x_train_problem = df_problem["sequence"][:]
-x_train_problem_groupped = []
+#df_problem= pd.read_csv("PROBLEM_SET.csv", names = ["sequence"])
+#x_train_problem = df_problem["sequence"][:]
+#x_train_problem_groupped = []
 
-for sequence in x_train_problem:
-    x_train_problem_groupped.append(feature_selector(sequence))
+#for sequence in x_train_problem:
+#    x_train_problem_groupped.append(feature_selector(sequence))
 
-y_predicted_problem = clf.predict(x_train_problem_groupped)
+#y_predicted_problem = clf.predict(x_train_problem_groupped)
 
-df_problem["predicted_scores"] = y_predicted_problem
+#df_problem["predicted_scores"] = y_predicted_problem
 
-df_problem.to_csv("result.csv", columns = ["sequence", "predicted_scores"])
+#df_problem.to_csv("result.csv", columns = ["sequence", "predicted_scores"])
