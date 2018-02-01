@@ -7,19 +7,21 @@ from sklearn import linear_model
 from sklearn.metrics import accuracy_score
 from string  import ascii_letters
 from keras.models import Sequential  
-from keras.layers.core import Dense, Activation  
+from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 
-in_out_neurons = 2  
-hidden_neurons = 300
+
 
 model = Sequential()
-model.add(LSTM(hidden_neurons, return_sequences=False,
-               input_shape=(None, in_out_neurons)))
-model.add(Dense(in_out_neurons, input_dim=hidden_neurons))  
-model.add(Activation("linear"))  
-model.compile(optimizer='rmsprop',loss='binary_crossentropy',metrics=['accuracy'])
+model.add(Dense(64, input_dim=10, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
 
+model.compile(loss='binary_crossentropy',
+              optimizer='rmsprop',
+              metrics=['accuracy'])
 
 
 def reading():
@@ -82,7 +84,10 @@ print(len(X_train), len(X_test))
 
 ##classifying on train set
 
-model.fit(np.array(X_train), np.array(y_train))
+model.fit(np.array(X_train),np.array(y_train),
+          epochs=20,
+          batch_size=128)
+
 
 ## testing on test
 
